@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏥 MediStruct — Hospital Management System (DSA Project)
 
-## Getting Started
+A Hospital Management System where **every workflow is powered by a hand-written
+data structure**. Built with Next.js 16 (App Router), TypeScript, Tailwind v4,
+Better Auth, and Neon Postgres.
 
-First, run the development server:
+Three roles — **Admin**, **Doctor**, **Receptionist** — walk a patient through
+the full journey: registration → specialist routing → consultation → labs →
+operation → admission → **discharge**, with a complete audit trail.
+
+## Where each data structure is used
+
+All structures are hand-written from scratch in [`src/lib/dsa/`](src/lib/dsa)
+(no libraries). Each exports a `complexity` descriptor shown live on the **DSA
+Gallery** page (`/dsa`).
+
+> **For the full DSA write-up — where each structure is used, how it is
+> implemented, pseudocode, and complexity — see [DSA.md](DSA.md).**
+
+| Structure | File | Real feature |
+|---|---|---|
+| **Dynamic Array** | `dynamic-array.ts` | Bill line-items; binary search over sorted IDs |
+| **Queue (FIFO)** | `queue.ts` | Reception & doctor **waiting queues** |
+| **Priority Queue (min-heap)** | `priority-queue.ts` | **Emergency triage** (live demo on `/dsa`) |
+| **Stack (LIFO)** | `stack.ts` | Undo / action history |
+| **Singly Linked List** | `linked-list.ts` | Doctor's chronological **notes log** |
+| **Doubly Linked List** | `doubly-linked-list.ts` | **Patient timeline** — walk forward/back (O(1)) |
+| **Binary Search Tree** | `bst.ts` | Patient lookup by ID |
+| **Red-Black Tree** | `red-black-tree.ts` | Balanced **appointment index by date** |
+| **Graph (adjacency list)** | `graph.ts` | **Symptom → specialist routing** (BFS / Dijkstra) |
+| **Hash Map (chaining)** | `hash-map.ts` | O(1) patient / insurance / doctor lookups |
+| **Sorting (5 algorithms)** | `sorting.ts` | Rank doctors, bills, appointments (live race on `/dsa`) |
+
+## Workflow highlights
+
+- **Auto patient ID** — Postgres `serial`, integer starting at 1 (collision-safe).
+- **Insurance** — percentage coverage; concession (lab/operation/admission only,
+  never the consultation) applied first, then insurance %, then patient pays the rest.
+- **Operation loop** — schedule → must pay before the date → else **reschedule**
+  (patient meets doctor again → new date) → pay → complete → **discharge**.
+- **Beds** — admitting occupies a bed; **discharge frees it automatically**.
+- **Audit trail** — every action appends a `patient_events` row = the timeline.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run seed      # creates schema + demo data + login accounts
+npm run dev       # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Demo accounts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@medistruct.com | admin123 |
+| Doctor | sara@medistruct.com | doctor123 |
+| Receptionist | reception@medistruct.com | reception123 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tests
 
-## Learn More
+```bash
+npm run dsa:test                # 20 unit assertions on the data structures
+npx tsx scripts/flow-test.mts   # full patient-journey write-path integration test
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Security note
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The Neon `DATABASE_URL` lives in `.env.local` (gitignored). **Rotate the
+password in the Neon console before making this repo public or submitting.**
+Also change `BETTER_AUTH_SECRET`.
