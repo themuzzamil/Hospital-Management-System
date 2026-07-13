@@ -26,12 +26,12 @@ So a request typically does: **read rows from Postgres → build a data structur
 
 | Structure | File | Used by | Wired into a live workflow? |
 |-----------|------|---------|------------------------------|
-| Queue (FIFO) | `queue.ts` | `reception/queue`, `doctor/queue` | **Yes** — waiting lines |
+| Queue (FIFO) | `queue.ts` | `reception/queue` | **Yes** — reception waiting line |
 | Graph + Dijkstra/BFS | `graph.ts` | `lib/routing.ts` (New Patient) | **Yes** — symptom→specialist routing |
 | Singly Linked List | `linked-list.ts` | `doctor/.../clinical-console` | **Yes** — chronological note log |
 | Doubly Linked List | `doubly-linked-list.ts` | `components/timeline-viewer` | **Yes** — patient timeline |
 | Sorting (5 algorithms) | `sorting.ts` | `lib/routing.ts`, `/dsa` demo | **Yes** — rank doctors; live sort-race |
-| Min Priority Queue (heap) | `priority-queue.ts` | `/dsa` triage demo | Interactive demo on `/dsa` |
+| Min Priority Queue (heap) | `priority-queue.ts` | `doctor/queue`, `/dsa` triage demo | **Yes** — emergency triage (doctor's queue) |
 | Stack (LIFO) | `stack.ts` | DSA Gallery | Implemented + gallery (undo/history model) |
 | Binary Search Tree | `bst.ts` | DSA Gallery | Implemented + gallery (ID lookup) |
 | Red-Black Tree | `red-black-tree.ts` | DSA Gallery | Implemented + gallery (date index) |
@@ -45,8 +45,7 @@ Everything is unit-tested in `scripts/dsa-smoke.mts` (`npm run dsa:test`).
 # 1. Queue (FIFO)
 
 **File:** `src/lib/dsa/queue.ts`
-**Used in:** `src/app/(app)/reception/queue/page.tsx` and
-`src/app/(app)/doctor/queue/page.tsx`.
+**Used in:** `src/app/(app)/reception/queue/page.tsx` (the reception waiting line).
 
 ### Where & why
 A patient who walks in is *enqueued*; whoever has waited longest is served
@@ -54,6 +53,10 @@ first. This is textbook **first-come, first-served**, so a FIFO queue is the
 natural fit. The reception queue page loads all waiting patients from Postgres
 (ordered by arrival time), pushes them through our `Queue`, and renders the
 front of the line as "serve next".
+
+> The **doctor's** queue is *not* FIFO — a critical patient must be able to jump
+> ahead of a routine one. That queue is a **Min Priority Queue** keyed on triage
+> severity; see §3 below.
 
 ### How it is implemented
 A **singly linked chain of nodes** with `head` and `tail` pointers. Using a
@@ -124,13 +127,29 @@ class Stack:
 # 3. Min Priority Queue (Binary Heap)
 
 **File:** `src/lib/dsa/priority-queue.ts`
-**Used in:** the **Emergency Triage** demo on `/dsa` (`live-demos.tsx`).
+**Used in:** the doctor's **live queue** (`src/app/(app)/doctor/queue/page.tsx`)
+and the **Emergency Triage** demo on `/dsa` (`live-demos.tsx`).
 
 ### Where & why
 A plain FIFO queue cannot let a *critical* patient jump ahead of a *routine*
-one. A **min-heap** keyed on a severity number (1 = critical … 5 = routine)
-always dequeues the most urgent patient in **O(log n)**, regardless of arrival
+one. When a receptionist registers a patient they set a **triage severity**
+(1 = critical … 5 = routine), stored on the patient row. The doctor's queue
+loads all waiting patients and feeds them through this **min-heap**, so the most
+urgent patient is always dequeued next in **O(log n)**, regardless of arrival
 order.
+
+**Fair tie-breaking (FIFO within a severity).** Two patients with the *same*
+severity should be seen in arrival order. The queue page enqueues each patient
+with a **composite priority**:
+
+```
+priority = severity × 1_000_000 + arrivalIndex
+```
+
+Since `arrivalIndex` is always `< 1_000_000`, severity dominates the ordering and
+arrival time only breaks ties — so a severity-3 patient is always seen before a
+severity-5 patient, and among equal severities the one who has waited longest
+goes first.
 
 ### How it is implemented
 A **binary min-heap stored in an array**. For the node at index `i`:

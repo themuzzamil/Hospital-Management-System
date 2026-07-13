@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { findSpecialists, registerPatient } from "@/lib/actions";
 import type { RouteResult } from "@/lib/routing";
+import { SEVERITY_LEVELS } from "@/components/ui";
 
 type DoctorOpt = { id: number; name: string; specialty: string; fee: number; rating: number };
 
@@ -17,6 +18,7 @@ export default function NewPatientForm({ doctors, issues }: { doctors: DoctorOpt
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [issue, setIssue] = useState("");
+  const [severity, setSeverity] = useState(3);
   const [doctorId, setDoctorId] = useState<number | "">("");
   const [method, setMethod] = useState<"self" | "insurance">("self");
   const [provider, setProvider] = useState("");
@@ -52,6 +54,7 @@ export default function NewPatientForm({ doctors, issues }: { doctors: DoctorOpt
           phone: phone || null,
           address: address || null,
           issue: issue || null,
+          severity,
           doctorId: doctorId === "" ? null : Number(doctorId),
           paymentMethod: method,
           insuranceProvider: method === "insurance" ? provider || null : null,
@@ -114,6 +117,25 @@ export default function NewPatientForm({ doctors, issues }: { doctors: DoctorOpt
           ))}
         </select>
         {routing && <p className="text-xs text-muted mt-2">Routing…</p>}
+
+        <div className="mt-4">
+          <label className="label">Triage severity</label>
+          <select
+            className="input"
+            value={severity}
+            onChange={(e) => setSeverity(Number(e.target.value))}
+          >
+            {SEVERITY_LEVELS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.value} · {s.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-muted mt-1">
+            Sets the patient&apos;s place in the doctor&apos;s priority queue — lower
+            number = more critical = seen sooner, regardless of arrival order.
+          </p>
+        </div>
 
         {route && (
           <div className="mt-4 rounded-lg bg-background border border-border p-3 text-sm">

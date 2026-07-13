@@ -10,6 +10,16 @@ import { pool } from "./db";
  */
 export const auth = betterAuth({
   database: pool,
+  // Origins allowed to call the auth API. Better Auth rejects any request
+  // whose Origin header isn't listed here ("Invalid origin"). We trust the
+  // configured base URL plus Vercel's per-deployment URL (which differs on
+  // every preview deploy) and any *.vercel.app preview domain.
+  trustedOrigins: [
+    "https://hospital-management-system-jade-two.vercel.app",
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+    "https://*.vercel.app",
+  ],
   emailAndPassword: {
     enabled: true,
     // Admin-created accounts; no public email verification step for this project.

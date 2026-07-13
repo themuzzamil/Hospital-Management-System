@@ -37,7 +37,7 @@ export default async function DoctorPatientDetail({
   ]);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader
         title={`#${patient.id} · ${patient.name}`}
         subtitle={`${patient.age ?? "—"} yrs · ${patient.gender ?? "—"} · ${patient.issue ?? "no issue noted"}`}

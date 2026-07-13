@@ -7,7 +7,7 @@ export default async function AdminWards() {
   const wards = await getWardsWithBeds();
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader title="Wards & Beds" subtitle="Live bed occupancy. Beds free up automatically on discharge." />
       <div className="space-y-6">
         {wards.map((w) => {

@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS patients (
   payment_method text NOT NULL DEFAULT 'self' CHECK (payment_method IN ('self','insurance')),
   insurance_provider text,
   insurance_coverage_percent int NOT NULL DEFAULT 0,
+  -- Triage severity set by reception: 1 = critical ... 5 = routine.
+  -- Drives the doctor's priority queue (most-critical seen first).
+  severity int NOT NULL DEFAULT 3 CHECK (severity BETWEEN 1 AND 5),
   status text NOT NULL DEFAULT 'registered'
     CHECK (status IN ('registered','with_doctor','follow_up','checkup_complete','admitted','discharged')),
   created_by text,

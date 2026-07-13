@@ -15,7 +15,7 @@ export default async function PatientsPage({
   const patients = await getPatients({ search: q, status });
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader
         title="Patients"
         subtitle="Search by name or ID (hash-map / BST lookup). Click a patient to open their record."

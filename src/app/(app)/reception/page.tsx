@@ -14,7 +14,7 @@ export default async function ReceptionDashboard() {
   const recent = patients.slice(0, 8);
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader
         title="Reception Desk"
         subtitle="Register patients, route them to specialists, and manage billing."

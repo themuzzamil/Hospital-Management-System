@@ -21,7 +21,7 @@ export default async function QueuePage() {
   const ordered = q.toArray();
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader
         title="Waiting Queue"
         subtitle="First-come, first-served — modelled by the hand-written Queue (FIFO). Front of the line is served next."

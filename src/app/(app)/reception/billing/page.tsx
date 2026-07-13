@@ -17,7 +17,7 @@ export default async function BillingPage() {
   const pending = bills.filter((b) => b.status === "pending");
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader
         title="Billing"
         subtitle={`${pending.length} pending · ${money(pending.reduce((s, b) => s + Number(b.patient_payable), 0))} outstanding`}

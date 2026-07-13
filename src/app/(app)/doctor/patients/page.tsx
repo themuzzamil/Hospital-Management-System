@@ -8,7 +8,7 @@ export default async function DoctorPatients() {
   const user = await requireRole("doctor");
   const patients = user.doctorId ? await getPatients({ doctorId: user.doctorId }) : [];
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader title="My Patients" subtitle="Everyone assigned to you." />
       {patients.length === 0 ? (
         <EmptyState>No patients assigned yet.</EmptyState>

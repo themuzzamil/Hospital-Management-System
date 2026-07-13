@@ -18,6 +18,8 @@ export interface Patient {
   payment_method: PaymentMethod;
   insurance_provider: string | null;
   insurance_coverage_percent: number;
+  /** Triage severity: 1 = critical … 5 = routine. Drives the doctor priority queue. */
+  severity: number;
   status: PatientStatus;
   created_by: string | null;
   created_at: string;

@@ -11,7 +11,7 @@ export default async function DoctorDashboard() {
   const admitted = patients.filter((p) => p.status === "admitted");
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader title={`Welcome, ${user.name}`} subtitle="Your patients and clinical actions." />
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <StatCard label="In your queue" value={waiting.length} icon="clock" href="/doctor/queue" />

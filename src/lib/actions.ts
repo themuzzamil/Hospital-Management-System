@@ -34,16 +34,20 @@ export type RegisterPatientInput = {
   paymentMethod: PaymentMethod;
   insuranceProvider: string | null;
   coveragePercent: number;
+  /** Triage severity 1 (critical) … 5 (routine). Defaults to 3 if omitted. */
+  severity?: number;
 };
 
 /** Create a patient (auto integer id), open a consultation bill, log events. */
 export async function registerPatient(input: RegisterPatientInput) {
   const who = await actor();
+  // Clamp to the valid 1–5 triage range; default to 3 (urgent) when unset.
+  const severity = Math.min(5, Math.max(1, Math.round(input.severity ?? 3)));
   const patient = await queryOne<{ id: number }>(
     `INSERT INTO patients
       (name, age, gender, phone, address, issue, assigned_doctor_id,
-       payment_method, insurance_provider, insurance_coverage_percent, status, created_by)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'registered',$11)
+       payment_method, insurance_provider, insurance_coverage_percent, severity, status, created_by)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'registered',$12)
      RETURNING id`,
     [
       input.name,
@@ -56,11 +60,17 @@ export async function registerPatient(input: RegisterPatientInput) {
       input.paymentMethod,
       input.insuranceProvider,
       input.coveragePercent,
+      severity,
       (await getCurrentUser())?.id ?? null,
     ],
   );
   const patientId = patient!.id;
-  await logEvent(patientId, "registered", `Patient registered. Issue: ${input.issue ?? "n/a"}`, who);
+  await logEvent(
+    patientId,
+    "registered",
+    `Patient registered. Issue: ${input.issue ?? "n/a"} · Triage severity ${severity}.`,
+    who,
+  );
 
   // Open the consultation bill from the assigned doctor's fee.
   if (input.doctorId) {

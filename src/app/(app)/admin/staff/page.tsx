@@ -9,7 +9,7 @@ export default async function AdminStaff() {
     `SELECT id, name, email FROM "user" WHERE role='receptionist' ORDER BY name`,
   );
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader title="Receptionists" subtitle="Create front-desk accounts." />
       <StaffManager staff={staff} />
     </div>

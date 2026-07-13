@@ -20,8 +20,8 @@ Gallery** page (`/dsa`).
 | Structure | File | Real feature |
 |---|---|---|
 | **Dynamic Array** | `dynamic-array.ts` | Bill line-items; binary search over sorted IDs |
-| **Queue (FIFO)** | `queue.ts` | Reception & doctor **waiting queues** |
-| **Priority Queue (min-heap)** | `priority-queue.ts` | **Emergency triage** (live demo on `/dsa`) |
+| **Queue (FIFO)** | `queue.ts` | Reception **waiting queue** (first-come, first-served) |
+| **Priority Queue (min-heap)** | `priority-queue.ts` | **Emergency triage** — doctor's queue serves the most-critical patient first |
 | **Stack (LIFO)** | `stack.ts` | Undo / action history |
 | **Singly Linked List** | `linked-list.ts` | Doctor's chronological **notes log** |
 | **Doubly Linked List** | `doubly-linked-list.ts` | **Patient timeline** — walk forward/back (O(1)) |
@@ -34,6 +34,9 @@ Gallery** page (`/dsa`).
 ## Workflow highlights
 
 - **Auto patient ID** — Postgres `serial`, integer starting at 1 (collision-safe).
+- **Emergency triage** — reception sets a severity (1 = critical … 5 = routine) at
+  registration; the doctor's queue is a **min-heap** that serves the most-critical
+  patient first, breaking ties by who has waited longest (FIFO fallback).
 - **Insurance** — percentage coverage; concession (lab/operation/admission only,
   never the consultation) applied first, then insurance %, then patient pays the rest.
 - **Operation loop** — schedule → must pay before the date → else **reschedule**

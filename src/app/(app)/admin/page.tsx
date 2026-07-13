@@ -21,7 +21,7 @@ export default async function AdminDashboard() {
   );
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <PageHeader title="Administration" subtitle="Manage staff, doctors and hospital capacity." />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Active doctors" value={Number(row?.doctors ?? 0)} icon="stethoscope" href="/admin/doctors" />

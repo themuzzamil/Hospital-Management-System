@@ -51,6 +51,24 @@ export function StatusBadge({ status }: { status: string }) {
   return <span className={cls}>{status.replace(/_/g, " ")}</span>;
 }
 
+/** Triage severity: 1 = critical … 5 = routine. Shared by the form and the queue. */
+export const SEVERITY_LEVELS = [
+  { value: 1, label: "Critical", badge: "badge-red" },
+  { value: 2, label: "Emergency", badge: "badge-red" },
+  { value: 3, label: "Urgent", badge: "badge-amber" },
+  { value: 4, label: "Moderate", badge: "badge-blue" },
+  { value: 5, label: "Routine", badge: "badge-gray" },
+] as const;
+
+export function severityMeta(level: number) {
+  return SEVERITY_LEVELS.find((s) => s.value === level) ?? SEVERITY_LEVELS[2];
+}
+
+export function SeverityBadge({ level }: { level: number }) {
+  const meta = severityMeta(level);
+  return <span className={meta.badge}>Sev {level} · {meta.label}</span>;
+}
+
 export function EmptyState({ children }: { children: React.ReactNode }) {
   return (
     <div className="card p-8 text-center text-muted text-sm">{children}</div>

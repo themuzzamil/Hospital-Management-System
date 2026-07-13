@@ -54,8 +54,10 @@ function TriageDemo() {
     <div className="card p-5">
       <h3 className="font-semibold">Emergency triage — Priority Queue</h3>
       <p className="text-xs text-muted mt-1 mb-3">
-        Most-critical patient (lowest severity number) is always served next —
-        regardless of arrival order. Heap dequeue is O(log n).
+        This is now a <span className="font-medium text-foreground">live feature</span>:
+        reception sets each patient&apos;s severity, and the doctor&apos;s queue serves
+        the most-critical patient (lowest severity number) next — regardless of
+        arrival order, with ties broken by who has waited longest. Heap dequeue is O(log n).
       </p>
       <div className="flex gap-2 mb-3">
         <button className="btn-primary px-3 py-1 text-sm" onClick={serveNext} disabled={pool.length === 0}>
@@ -119,6 +121,7 @@ function SortRaceDemo() {
         <button className="btn-primary px-3 py-1 text-sm whitespace-nowrap" onClick={race}>Run</button>
       </div>
       {results.length > 0 && (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-muted text-left">
             <tr>
@@ -139,6 +142,7 @@ function SortRaceDemo() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

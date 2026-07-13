@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "@/lib/auth-client";
 import { Icon, type IconName } from "./icons";
 
@@ -39,6 +39,12 @@ export default function Shell({
   const pathname = usePathname();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -51,11 +57,45 @@ export default function Shell({
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-60 shrink-0 border-r border-border bg-surface flex flex-col">
-        <div className="px-5 py-4 border-b border-border">
-          <Logo />
-          <p className="text-xs text-muted mt-1.5 ml-0.5">{roleLabel[user.role]}</p>
+    <div className="min-h-screen md:flex">
+      {/* Mobile top bar — only shown below the md breakpoint. */}
+      <header className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+        <Logo />
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="grid place-items-center h-9 w-9 rounded-lg text-muted hover:bg-background hover:text-foreground"
+          aria-label="Open menu"
+        >
+          <Icon name="menu" size={20} />
+        </button>
+      </header>
+
+      {/* Backdrop for the mobile drawer. */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[80%] border-r border-border bg-surface flex flex-col transition-transform duration-200 md:static md:z-auto md:w-60 md:max-w-none md:shrink-0 md:translate-x-0 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <div>
+            <Logo />
+            <p className="text-xs text-muted mt-1.5 ml-0.5">{roleLabel[user.role]}</p>
+          </div>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden grid place-items-center h-8 w-8 rounded-lg text-muted hover:bg-background hover:text-foreground"
+            aria-label="Close menu"
+          >
+            <Icon name="close" size={18} />
+          </button>
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
@@ -110,7 +150,7 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
         {subtitle && <p className="text-muted text-sm mt-1">{subtitle}</p>}
