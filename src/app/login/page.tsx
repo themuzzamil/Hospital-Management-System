@@ -25,14 +25,7 @@ export default async function LoginPage() {
           <LoginForm />
         </div>
 
-        <div className="card p-4 mt-4 text-xs text-muted">
-          <p className="font-medium text-foreground mb-2">Demo accounts</p>
-          <ul className="space-y-1">
-            <li>Admin — admin@medistruct.com / admin123</li>
-            <li>Doctor — sara@medistruct.com / doctor123</li>
-            <li>Reception — reception@medistruct.com / reception123</li>
-          </ul>
-        </div>
+        
       </div>
     </div>
   );
